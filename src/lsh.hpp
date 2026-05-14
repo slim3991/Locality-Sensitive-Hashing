@@ -1,5 +1,4 @@
 #pragma once
-
 #include <cmath>
 #include <csignal>
 #include <cstddef>
@@ -27,7 +26,7 @@ public:
     std::uniform_real_distribution<double> dist_u(0, W);
     std::normal_distribution<double> dist_n(0, 1);
 
-   projections.resize(n_hash);
+    projections.resize(n_hash);
     for (auto &proj : projections) {
       std::vector<double> a(data_size);
       for (double &element : a)
@@ -37,10 +36,14 @@ public:
   };
 
   HashResult compute_hash(const std::vector<double> &data) {
+    if (data.size() != data_size) {
+      throw std::invalid_argument("Size missmatch");
+    }
+
     HashResult results(n_hash);
     for (size_t i{0}; i < n_hash; i++) {
-      double dot = std::inner_product(projections[i].a.begin(),
-                                      projections[i].a.end(), data.begin(), 0);
+      double dot = std::inner_product(
+          projections[i].a.begin(), projections[i].a.end(), data.begin(), 0.0);
       results[i] = std::floor((dot + projections[i].b) / W);
     };
     return results;
@@ -61,7 +64,7 @@ public:
 
 private:
   std::mt19937 &random_gen() {
-    static std::random_device rd;
+    static  std::random_device rd;
     static std::mt19937 gen{rd()};
     return gen;
   }
