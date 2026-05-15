@@ -7,8 +7,11 @@
 #include <stdexcept>
 #include <vector>
 
+namespace find_better_name { // TODO: find better name
+
+using HashResult = std::vector<int>;
+
 class LSH {
-  using HashResult = std::vector<double>;
   double W;
   size_t n_hash;
   size_t data_size;
@@ -35,7 +38,7 @@ public:
     }
   };
 
-  HashResult compute_hash(const std::vector<double> &data) {
+  HashResult compute_hash(const std::vector<double> &data) const {
     if (data.size() != data_size) {
       throw std::invalid_argument("Size missmatch");
     }
@@ -49,7 +52,19 @@ public:
     return results;
   };
 
-  double compare(const HashResult &res1, const HashResult &res2) {
+  bool match(const HashResult &res1, const HashResult &res2) const {
+    if (res1.size() != res2.size()) {
+      throw std::invalid_argument("Size missmatch");
+    }
+    int matches{0};
+    for (size_t i{0}; i < n_hash; i++) {
+      if (res1[i] == res2[i])
+        matches++;
+    }
+    return matches == n_hash;
+  }
+
+  double compare(const HashResult &res1, const HashResult &res2) const {
     if (res1.size() != res2.size()) {
       throw std::invalid_argument("Size missmatch");
     }
@@ -64,8 +79,9 @@ public:
 
 private:
   std::mt19937 &random_gen() {
-    static  std::random_device rd;
+    static std::random_device rd;
     static std::mt19937 gen{rd()};
     return gen;
   }
 };
+} // namespace find_better_name
